@@ -13,8 +13,9 @@ fitness = |cost|^(-1) + |science| + alpha*(num_blocks-target)
 
 '''
 from threading import Thread, Lock, Condition
-
-
+import random
+NUM_TRIES = 20
+NUM_TAKE = 5
 class PreferenceLearner(self):
 	incoming_configs = [] ## list of (config, science, cost)
 	outgoing_configs = []
@@ -22,18 +23,43 @@ class PreferenceLearner(self):
 		self.fitness_map = {} # configuration -> [science, cost, fitness]
 		self.target = 0
 		self.lock = Lock()
+		self.targetLock = Lock()
 
 
-	def add_user_points_to_map(self):
-		raise NotImplemented
+	def calc_local_pts(self, jump_config):
+		with self.targetLock:
+			config_tuples = []
+			for i in range(0, NUM_TRIES):
+				index = random.randint(0,60)
+				config_lst = list(jump_config)
+			
+				if(config_lst[index] == 0):
+					config_lst[index] = 1
+				else:
+					config_lst[index] = 0
+
+				new_config = "".join(config_lst)
+				science, cost = evaluate_architecture(new_config)
+				fitness = cost + science + (get_num_blocks(config)-self.target)
+				config_tuples.append((new_config, science, cost, fitness))
+
+			sorted_config_tuples = sorted(configs, key = lambda a : a[3])[0:NUM_TAKE]
+			return sorted_config_tuples
 
 	def update_target(self):
 		raise NotImplemented
 
 	def recompute_fitness(self):
+		max_fitness = 0
+		max_config = ""
 		for config in self.fitness_map:
-			cost, science, fitness = self.fitness_map[config]
-			new_fitness = 
+			science, cost, fitness = self.fitness_map[config]
+			new_fitness = cost + science + (get_num_blocks(config)-self.target)
+			self.fitness_map[config] = (science, cost, new_fitness)
+			if new_fitness > max_fitness:
+				max_fitness = new_fitness
+				max_config = config
+		return max_config
 
 	def get_num_blocks(self, configuration):
 		num_blocks = 0
@@ -43,17 +69,13 @@ class PreferenceLearner(self):
 				num_blocks += 1
 		return num_blocks
 
-
-
 	def evaluate_architecture(self, configuration):
 		return (0,0)
-
 
 	def push_user_points(self, user_points):
 		with self.lock:
 			for i in user_points:
 				incoming_points.append(i)
-
 
 	def update_map(self):
 		with self.lock:
@@ -62,14 +84,15 @@ class PreferenceLearner(self):
 				fitness_map[config] = (science, cost, 0)
 			incoming_points = []
 
-
 	def compute_preferences(self):
 		while true:
 			update_map()
-			
-
-
-
+			jump_config = recompute_fitness()
+			config_tuples = calc_local_pts(jump_config)
+			for config_tuple in config_tuples:
+				config, science, cost, fitness = config_tuple
+				fitness_map[config] = (science, cost, fitness)
+			#post new configurations to user
 
 
 	
