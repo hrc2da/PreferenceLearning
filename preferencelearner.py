@@ -16,7 +16,7 @@ from threading import Thread, Lock, Condition
 import random
 NUM_TRIES = 20
 NUM_TAKE = 5
-class PreferenceLearner(self):
+class PreferenceLearner:
 	incoming_points = [] ## list of (config, science, cost)
 	outgoing_points = []
 	def __init__(self):
@@ -98,7 +98,9 @@ class PreferenceLearner(self):
 	
 
 def run():
-	p = Pre()
+	p = PreferenceLearner()
+	p.compute_preferences()
+
 
 if __name__ == '__main__':
 	run()
