@@ -17,8 +17,8 @@ import random
 NUM_TRIES = 20
 NUM_TAKE = 5
 class PreferenceLearner(self):
-	incoming_configs = [] ## list of (config, science, cost)
-	outgoing_configs = []
+	incoming_points = [] ## list of (config, science, cost)
+	outgoing_points = []
 	def __init__(self):
 		self.fitness_map = {} # configuration -> [science, cost, fitness]
 		self.target = 0
